@@ -8,6 +8,7 @@ import dagger.android.AndroidInjection
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -23,10 +24,10 @@ class MainActivity : AppCompatActivity() {
             val p = api.getProduct("3329770057258")
             p.enqueue(object: Callback<ProductContainer>{
                 override fun onResponse(call: Call<ProductContainer>, response: Response<ProductContainer>) {
-                    android.util.Log.d("MainActivity", "response: ${response.body()}")
+                    Timber.d("response: ${response.body()}")
                 }
                 override fun onFailure(call: Call<ProductContainer>, t: Throwable) {
-                    android.util.Log.w("MainActivity", "onFailure: $t")
+                    Timber.w("onFailure: $t")
                 }
             } )
         }.start()
