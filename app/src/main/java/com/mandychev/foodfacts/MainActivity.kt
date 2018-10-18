@@ -1,13 +1,11 @@
 package com.mandychev.foodfacts
 
+import android.arch.lifecycle.Observer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.mandychev.foodfacts.api.FoodfactsApi
+import com.mandychev.foodfacts.api.*
 import com.mandychev.foodfacts.vo.ProductContainer
 import dagger.android.AndroidInjection
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -20,16 +18,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Thread {
-            val p = api.getProduct("3329770057258")
-            p.enqueue(object: Callback<ProductContainer>{
-                override fun onResponse(call: Call<ProductContainer>, response: Response<ProductContainer>) {
-                    Timber.d("response: ${response.body()}")
+        val data = api.getProduct("3329770057258")
+        data.observe(this, Observer<ApiResponse<ProductContainer>> { response ->
+            when (response) {
+                is ApiSuccessResponse -> {
+                    val product = response.body
+                    Timber.d("product: $product")
                 }
-                override fun onFailure(call: Call<ProductContainer>, t: Throwable) {
-                    Timber.w("onFailure: $t")
+                is ApiEmptyResponse -> {
+                    Timber.w("empty response")
                 }
-            } )
-        }.start()
-    }
+                is ApiErrorResponse -> {
+                    Timber.w("${response.errorMessage}")
+                }
+            }
+        })
+
+        }
 }
